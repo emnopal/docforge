@@ -1,5 +1,4 @@
-@import "tailwindcss/preflight";
-@tailwind utilities;
+@import 'tailwindcss';
 
 @theme {
 	--color-bg-primary: #05050a;
