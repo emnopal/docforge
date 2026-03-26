@@ -21,6 +21,20 @@
  			icon: '📄',
  			route: '/pdf-rearranger',
  			color: 'var(--color-accent-purple)'
+ 		},
+ 		{
+ 			name: 'PDF Extractor',
+ 			description: 'Extract selected pages from PDF into a new PDF or image files in one click.',
+ 			icon: '✂️',
+ 			route: '/pdf-extractor',
+ 			color: 'var(--color-accent-cyan)'
+ 		},
+ 		{
+ 			name: 'PDF Joiner',
+ 			description: 'Combine one or multiple PDF files into one PDF with drag-and-drop document ordering.',
+ 			icon: '📚',
+ 			route: '/pdf-joiner',
+ 			color: 'var(--color-accent-green)'
  		}
  	];
 </script>
