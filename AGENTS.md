@@ -39,6 +39,7 @@ To create a new module:
 ## Code Style Guidelines
 
 ### Svelte 5 Runes
+
 - Use `$state()` for reactive state variables
 - Use `$derived()` for computed values
 - Use `$effect()` for side effects (use sparingly)
@@ -46,6 +47,7 @@ To create a new module:
 - Example: `let { job, onDownload, onReset }: { job: ConversionJob; onDownload: () => void; onReset: () => void; } = $props();`
 
 ### TypeScript
+
 - Strict mode enabled in tsconfig.json
 - Use type-only imports with `import type { ... }`
 - All functions must have explicit return types inferred or declared
@@ -53,17 +55,19 @@ To create a new module:
 - Use `any` sparingly; prefer unknown or specific types
 
 ### Imports
+
 - Group imports: external libraries → internal modules → type imports
 - Use `$lib` alias for src/lib directory: `import { foo } from '$lib/types'`
 - Keep imports at the top of the file
 - Use dynamic imports for heavy libraries in converter functions: `const library = await import('library-name');`
 - Example:
   ```typescript
-  import { FORMAT_MAP, type FileFormat, type ConversionJob } from '$lib/types';
-  import type { ProgressCallback } from '$lib/types';
+  import { FORMAT_MAP, type FileFormat, type ConversionJob } from "$lib/types";
+  import type { ProgressCallback } from "$lib/types";
   ```
 
 ### Naming Conventions
+
 - **Components**: PascalCase (e.g., `ConversionPanel.svelte`)
 - **Functions**: camelCase (e.g., `convertFile`, `onFileSelect`)
 - **Constants**: UPPER_CASE for global constants (e.g., `FORMAT_MAP`, `ACCEPT`)
@@ -71,6 +75,7 @@ To create a new module:
 - **Files**: kebab-case (e.g., `pdf-utils.ts`, `drop-zone.svelte`)
 
 ### File Organization
+
 ```
 src/
 ├── lib/
@@ -84,6 +89,7 @@ src/
 ```
 
 ### Component Patterns
+
 - Use `$props()` for component props at the top of the script section
 - Use `$state()` for local reactive state
 - Use `$derived()` for computed values based on state or props
@@ -91,12 +97,14 @@ src/
 - Use svelte-ignore comments sparingly for intentional a11y exceptions
 
 ### Error Handling
+
 - Use try/catch for async operations
 - Provide descriptive error messages
 - Update job state with error information: `{ ...job, status: 'error', error: message }`
 - Use optional chaining for callbacks: `onProgress?.(value)`
 
 ### Styling
+
 - Uses Tailwind CSS v4 with `@import "tailwindcss"`
 - Custom CSS variables defined in `@theme` block in `app.css`
 - Prefers utility classes over inline styles
@@ -104,24 +112,28 @@ src/
 - Use color-mix function for dynamic colors: `color-mix(in srgb, ${color} 20%, var(--color-bg-elevated))`
 
 ### Async Operations
+
 - Use progress callbacks for long-running operations: `(progress: number) => void`
 - Report progress incrementally throughout the conversion
 - Use optional chaining for callbacks: `onProgress?.(currentStep / totalSteps * 100)`
 - Dynamic import heavy libraries inside functions to improve initial load time
 
 ### File Conversions
+
 - All conversion functions return `Promise<Blob>`
 - Functions follow pattern: `[source]To[Target](file: File, onProgress?: ProgressCallback): Promise<Blob>`
 - Register converters in `src/lib/converters/engine.ts` with key format: `'source->target'`
 - Format detection handled by `detectFormat()` function in types
 
 ### Type Safety
+
 - File formats are strictly typed using `FileFormat` union type
 - Always validate format before conversion
 - Use type guards where appropriate
 - Use FORMAT_MAP constant for format metadata (icon, color, mime type, extension)
 
 ### Best Practices
+
 - Write self-documenting code with clear variable and function names
 - Avoid inline event handlers; use functions defined in the script section
 - Use the `FORMAT_MAP` constant to get format-specific UI elements (colors, icons)
@@ -129,11 +141,13 @@ src/
 - Handle both single and multi-page documents appropriately in converters
 
 ### Vite Configuration
+
 - PDF.js worker is excluded from optimization to prevent build issues
 - Tailwind CSS plugin is configured for utility-first styling
 - SvelteKit adapter is configured for static site generation
 
 ### Dynamic Import Pattern
+
 Heavy libraries should be imported dynamically inside functions to avoid bundling issues and improve load times:
 
 ```typescript
@@ -146,6 +160,7 @@ export async function convertPdfToDocx(file: File, onProgress?: ProgressCallback
 ```
 
 ### Working with FORMAT_MAP
+
 Access format-specific metadata for UI elements:
 
 ```typescript
@@ -154,24 +169,29 @@ const badgeStyle = `background: color-mix(in srgb, ${formatInfo.color} 15%, #1e1
 ```
 
 ### Conversion Function Template
+
 Follow this pattern for new converter functions:
 
 ```typescript
-export async function sourceToTarget(file: File, onProgress?: ProgressCallback): Promise<Blob> {
+export async function sourceToTarget(
+  file: File,
+  onProgress?: ProgressCallback,
+): Promise<Blob> {
   const content = await file.text();
   onProgress?.(30);
-  
-  const Library = await import('library-name');
+
+  const Library = await import("library-name");
   const result = await Library.process(content);
   onProgress?.(70);
-  
-  const blob = new Blob([result], { type: 'mime/type' });
+
+  const blob = new Blob([result], { type: "mime/type" });
   onProgress?.(100);
   return blob;
 }
 ```
 
 ### No Comments
+
 - Do not add comments to code
 - Write self-documenting code with clear variable and function names
 - Use descriptive function names that explain their purpose

@@ -5,25 +5,25 @@ import { htmlToMarkdown } from "./markdown-utils";
 export async function htmlToImage(
   html: string,
   format: FileFormat,
-  onProgress?: ProgressCallback
+  onProgress?: ProgressCallback,
 ): Promise<Blob> {
-  const container = document.createElement('div');
+  const container = document.createElement("div");
   container.style.cssText =
-    'position:fixed;top:-9999px;left:-9999px;background:#fff;padding:32px;max-width:800px;font-family:sans-serif;color:#111';
+    "position:fixed;top:-9999px;left:-9999px;background:#fff;padding:32px;max-width:800px;font-family:sans-serif;color:#111";
   container.innerHTML = html;
   document.body.appendChild(container);
 
   onProgress?.(50);
   await new Promise((r) => setTimeout(r, 100));
 
-  const canvas = document.createElement('canvas');
+  const canvas = document.createElement("canvas");
   const rect = container.getBoundingClientRect();
   const scale = 2;
   canvas.width = rect.width * scale;
   canvas.height = rect.height * scale;
-  const ctx = canvas.getContext('2d')!;
+  const ctx = canvas.getContext("2d")!;
   ctx.scale(scale, scale);
-  ctx.fillStyle = '#fff';
+  ctx.fillStyle = "#fff";
   ctx.fillRect(0, 0, rect.width, rect.height);
 
   const svgData = `
@@ -34,7 +34,7 @@ export async function htmlToImage(
     </svg>`;
 
   const img = new Image();
-  const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+  const svgBlob = new Blob([svgData], { type: "image/svg+xml;charset=utf-8" });
   const url = URL.createObjectURL(svgBlob);
 
   await new Promise<void>((resolve, reject) => {
@@ -42,7 +42,7 @@ export async function htmlToImage(
       ctx.drawImage(img, 0, 0);
       resolve();
     };
-    img.onerror = () => reject(new Error('SVG render failed'));
+    img.onerror = () => reject(new Error("SVG render failed"));
     img.src = url;
   });
 
@@ -53,29 +53,32 @@ export async function htmlToImage(
   return canvasToBlob(canvas, format);
 }
 
-export async function htmlToMarkdownInternal(file: File, onProgress?: ProgressCallback): Promise<Blob> {
+export async function htmlToMarkdownInternal(
+  file: File,
+  onProgress?: ProgressCallback,
+): Promise<Blob> {
   const html = await file.text();
   onProgress?.(30);
   const md = htmlToMarkdown(html);
   onProgress?.(90);
-  return new Blob([md], { type: 'text/markdown' });
+  return new Blob([md], { type: "text/markdown" });
 }
 
 export async function htmlToPdf(file: File, onProgress?: ProgressCallback): Promise<Blob> {
   const html = await file.text();
   onProgress?.(30);
-  return htmlToImage(html, 'png', onProgress);
+  return htmlToImage(html, "png", onProgress);
 }
 
 export async function htmlToDocx(file: File, onProgress?: ProgressCallback): Promise<Blob> {
   const html = await file.text();
   onProgress?.(30);
-  const docx = await import('docx');
+  const docx = await import("docx");
   const { Document, Paragraph, TextRun, Packer } = docx;
 
   const text = html
-    .replace(/<[^>]+>/g, ' ')
-    .replace(/\s+/g, ' ')
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
     .trim();
 
   const paragraphs = text.split(/\n+/).filter(Boolean);
@@ -83,8 +86,8 @@ export async function htmlToDocx(file: File, onProgress?: ProgressCallback): Pro
     (p) =>
       new Paragraph({
         children: [new TextRun({ text: p.trim(), size: 24 })],
-        spacing: { after: 120 }
-      })
+        spacing: { after: 120 },
+      }),
   );
 
   onProgress?.(75);
@@ -94,13 +97,13 @@ export async function htmlToDocx(file: File, onProgress?: ProgressCallback): Pro
 }
 
 export async function htmlFileToImage(
-	file: File,
-	format: FileFormat,
-	onProgress?: ProgressCallback
+  file: File,
+  format: FileFormat,
+  onProgress?: ProgressCallback,
 ): Promise<Blob> {
-	const html = await file.text();
-	onProgress?.(30);
-	return htmlToImage(html, format, onProgress);
+  const html = await file.text();
+  onProgress?.(30);
+  return htmlToImage(html, format, onProgress);
 }
 
 export async function htmlToTxt(file: File, onProgress?: ProgressCallback): Promise<Blob> {
@@ -108,16 +111,16 @@ export async function htmlToTxt(file: File, onProgress?: ProgressCallback): Prom
   onProgress?.(50);
 
   const text = html
-    .replace(/<br\s*\/?>/gi, '\n')
-    .replace(/<\/p>/gi, '\n\n')
-    .replace(/<[^>]+>/g, '')
-    .replace(/&nbsp;/g, ' ')
-    .replace(/&lt;/g, '<')
-    .replace(/&gt;/g, '>')
-    .replace(/&amp;/g, '&')
-    .replace(/\n{3,}/g, '\n\n')
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/p>/gi, "\n\n")
+    .replace(/<[^>]+>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .replace(/&lt;/g, "<")
+    .replace(/&gt;/g, ">")
+    .replace(/&amp;/g, "&")
+    .replace(/\n{3,}/g, "\n\n")
     .trim();
 
   onProgress?.(90);
-  return new Blob([text], { type: 'text/plain' });
+  return new Blob([text], { type: "text/plain" });
 }
